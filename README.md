@@ -32,3 +32,4 @@ This template follows a structured format. The typical flow includes directories
 * Redis Integration: Utilizing Redis to optimize costs and improve response time.
 * Handling New Scenarios: Developing logic to handle scenarios not covered by the existing system.
 ## Demo:
+![Chatbot Architecture](./images/chatbot-architecture.png)
