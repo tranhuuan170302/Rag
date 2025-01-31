@@ -2,12 +2,12 @@ from openai import OpenAI
 import requests 
 from dotenv import load_dotenv
 import os
-import sys
-sys.path.append('d:/WorkSpace/RAG/API')
-from settings.settings import TELEGRAM_BOT_TOKEN
-from Rag.vectorSearch import get_search_result, vector_search_qa, vector_search
-from Rag.chat_model import model_LLM
-from ETL.pipelinePreprocessingData import pipeline_processing, load_stopwords
+# import sys
+# sys.path.append('d:/WorkSpace/RAG/API')
+from API.settings.settings import TELEGRAM_BOT_TOKEN
+from API.Rag.vectorSearch import VectorSearchImpl, VectorSearchQaImpl, SearchResultImpl
+from API.Rag.chat_model import model_reflection, model_retrivel, model_generator, model_router
+from API.ETL.pipelinePreprocessingData import pipeline_processing, load_stopwords
 from dotenv import load_dotenv
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -25,10 +25,14 @@ def serialize_document(doc):
     return doc
 
 
+vector_search_qa = VectorSearchQaImpl()
+vector_search = VectorSearchImpl()
+search_result = SearchResultImpl()
 
 class chatMessageRepository:
     def __init__(self, db):
         self.db = db
+        self.history = []
 
     async def chat(self, chatMessage):
 
@@ -37,28 +41,28 @@ class chatMessageRepository:
 
                 # reflection model   
                 logger.info(f"question from client: {chatMessage}")
-                reflection_sentence = model_LLM.model_reflection(chatMessage)
+                reflection_sentence = model_reflection(self.history, chatMessage)
                 logger.info(f"Reflection sentence from model Reflection: {reflection_sentence}") 
                 
                 # routing model
-                classify_question = model_LLM.model_classify(reflection_sentence)
+                classify_question = model_router(reflection_sentence)
                 logger.info(f"""question from model Category: {classify_question['category']} 
                                 and Sentence: {classify_question['message']}""")
 
                 if classify_question['category'] == "normal":
-                    generate_answer = model_LLM.model_generate(classify_question)
+                    generate_answer = model_generator(classify_question)
                     logger.info(f"generate the answer from model Generate: {generate_answer}")
                     return generate_answer
                 else:
                     # preprocessing reflection sentence
                     stopWord = load_stopwords("D:\WorkSpace\RAG\API\ETL\stopWord.txt")
                     clean_sentence = pipeline_processing(reflection_sentence, stopWord)
-                    get_knowledge = vector_search(clean_sentence, classify_question['category'], collection)
+                    get_knowledge = vector_search.vector_search(clean_sentence, classify_question['category'], collection)
                     
-                    results = get_search_result(get_knowledge)
+                    results = search_result.get_search_result(get_knowledge)
 
                     logger.info(f"smoth result: {results}")
-                    retrivel = model_LLM.model_retrivel(reflection_sentence, results)   
+                    retrivel = model_retrivel(reflection_sentence, results)
                     logger.info(f"question from model Retrivel: {retrivel}")
                     
                     return retrivel
@@ -70,7 +74,7 @@ class chatMessageRepository:
         try:
             collection = self.db["AnswersandQuestions"]
 
-            result = collection.insert_one(data)
+            collection.insert_one(data)
             return True
         except Exception as e:
             print(e)
@@ -78,7 +82,7 @@ class chatMessageRepository:
 
     async def anwser_storage(self, query: str) -> str:
         try:
-            embedd_query = vector_search_qa(query, self.db["AnswersandQuestions"])
+            embedd_query = vector_search_qa.vector_search(query, self.db["AnswersandQuestions"])
             return embedd_query
         except Exception as e:
             print(e)

@@ -6,13 +6,11 @@ import random
 from bs4 import BeautifulSoup
 
 from bson import ObjectId
-import sys
 import logging
-sys.path.append('d:/WorkSpace/RAG/API')
-from Rag.embedding import get_embedding
+from API.Rag.embedding import get_embedding
 from pipelinePreprocessingData import pipeline_processing, load_stopwords
-from Settings.settings import cookie, headers, params, url, categories
-from src.config import databaseConnect 
+from API.Settings.settings import cookie, headers, params, url, categories
+from API.src.config import databaseConnect
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

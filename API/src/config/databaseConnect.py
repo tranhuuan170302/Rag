@@ -2,12 +2,8 @@ from pymongo.mongo_client import MongoClient
 from pymongo.database import Database
 from os.path import join, dirname
 from typing import Optional
-import sys
-import os
 from dotenv import load_dotenv
-import sys
-sys.path.append('d:/WorkSpace/RAG/API')
-from settings.settings import MONGODB_URL, DATABASE_NAME
+from API.settings.settings import MONGODB_URL, DATABASE_NAME
 
 def signleTon(class_instance):
     instances = {}

@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from services.ChatService import chatMessageRepository
 from config.databaseConnect import get_database
-import sys
-sys.path.append('d:/WorkSpace/RAG/API')
-from Rag.embedding import get_embedding
+from API.Rag.embedding import get_embedding
 from dotenv import load_dotenv
 load_dotenv()
 # create routes
@@ -20,7 +18,7 @@ async def chat(message: Request):
         id = jsonBody['message']['from']['id']
 
         is_answer = await chat_service.anwser_storage(query)
-        if is_answer[0]['score'] > 0.98:
+        if is_answer[0]['score'] > 0.95:
             result = is_answer[0]['answer']
             await chat_service.send_message(result, id)
             return

@@ -1,12 +1,8 @@
 from sentence_transformers import SentenceTransformer
-import os
-from sklearn.metrics.pairwise import cosine_similarity
-
+from API.settings.settings import embedding_model
 class Embedding:
     def __init__(self):
-        self.embedding_for_document = SentenceTransformer("D:\\WorkSpace\\RAG\\API\\Model_LLM\\models--BAAI--bge-m3\\snapshots\\5617a9f61b028005a4858fdac845db406aefb181")
-        self.embedding_for_query = SentenceTransformer("D:\\WorkSpace\\RAG\\API\\Model_LLM\\models--intfloat--multilingual-e5-large\\snapshots\\ab10c1a7f42e74530fe7ae5be82e6d4f11a719eb")
-        self.embedding = SentenceTransformer("D:\\WorkSpace\\RAG\\API\\Model_LLM\\models--thenlper--gte-large\\snapshots\\4bef63f39fcc5e2d6b0aae83089f307af4970164")
+        self.embedding = SentenceTransformer(embedding_model)
     def encoder_document(self, text: str) -> list[float]:
         if not text.strip():
             print("Attempting to get embedding")
@@ -65,13 +61,3 @@ class Embedding:
             return None
 
 get_embedding = Embedding()
-# if __name__ == "__main__":
-
-#     sentence_query = "Tôi đang có nhu cầu tìm mua một chiếc lap top"
-#     sentence_document = "Bên tôi đang có các mặt hàng về chiếc lap top"
-#     embedding = Embedding()
-#     embedding_query = embedding.encoder_query(sentence_query)
-#     embedding_document = embedding.encoder_document(sentence_document)
-
-#     score = cosine_similarity([embedding_query], [embedding_document])[0][0]
-#     print(score)

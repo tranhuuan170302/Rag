@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-import sys
+
 load_dotenv()
 
 MONGODB_URL = os.environ.get("MONGODB_URL")
@@ -90,3 +90,4 @@ categories = [
 ]
 
 file_stopword  = "API/ETL/stopWord.txt"
+embedding_model = "API/Model_LLM/models--thenlper--gte-large/snapshots/4bef63f39fcc5e2d6b0aae83089f307af4970164"
