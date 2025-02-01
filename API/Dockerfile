@@ -7,16 +7,17 @@ WORKDIR /API
 # Copy file requirements trước để cache
 COPY requirements.txt .
 
-# Cài đặt thư viện Python
-RUN pip install -r requirements.txt
+# Cài đặt các thư viện Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy toàn bộ mã nguồn vào container
-COPY ./src ./src
-COPY ./ETL ./ETL
-COPY ./Rag ./Rag
-COPY ./settings ./settings
-COPY .env .env
+# Copy toàn bộ project vào container
+COPY . .
 
+# Thêm thư mục `src` vào PYTHONPATH để đảm bảo có thể import các module bên trong `src`
+ENV PYTHONPATH=/API/src
+
+# Expose cổng 8000 (cổng chạy FastAPI)
 EXPOSE 8000
+
 # Chạy ứng dụng bằng Uvicorn
-CMD ["uvicorn", "src.app:app", "--reload"]
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]
