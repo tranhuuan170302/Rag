@@ -89,5 +89,5 @@ categories = [
     }
 ]
 
-file_stopword  = "API/ETL/stopWord.txt"
+file_stopword  = "D:\WorkSpace\RAG\API\ETL\stopWord.txt"
 embedding_model = "thenlper/gte-large"

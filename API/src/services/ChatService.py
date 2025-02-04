@@ -1,9 +1,4 @@
-from openai import OpenAI
-import requests 
-from dotenv import load_dotenv
-import os
-# import sys
-# sys.path.append('d:/WorkSpace/RAG/API')
+import requests
 from API.settings.settings import TELEGRAM_BOT_TOKEN
 from API.Rag.vectorSearch import VectorSearchImpl, VectorSearchQaImpl, SearchResultImpl
 from API.Rag.chat_model import model_reflection, model_retrivel, model_generator, model_router
@@ -41,31 +36,34 @@ class chatMessageRepository:
 
                 # reflection model   
                 logger.info(f"question from client: {chatMessage}")
-                reflection_sentence = model_reflection(self.history, chatMessage)
+                reflection_sentence = chatMessage
+                if len(self.history) != 0:
+                    reflection_sentence = model_reflection.implement(self.history, chatMessage)
+
                 logger.info(f"Reflection sentence from model Reflection: {reflection_sentence}") 
                 
                 # routing model
-                classify_question = model_router(reflection_sentence)
+                classify_question = model_router.implement(reflection_sentence)
                 logger.info(f"""question from model Category: {classify_question['category']} 
                                 and Sentence: {classify_question['message']}""")
 
-                if classify_question['category'] == "normal":
-                    generate_answer = model_generator(classify_question)
+                if classify_question['category'] == "Khác":
+                    generate_answer = model_generator.implement(classify_question)
                     logger.info(f"generate the answer from model Generate: {generate_answer}")
                     return generate_answer
                 else:
                     # preprocessing reflection sentence
-                    stopWord = load_stopwords("D:\WorkSpace\RAG\API\ETL\stopWord.txt")
+                    stopWord = load_stopwords()
                     clean_sentence = pipeline_processing(reflection_sentence, stopWord)
                     get_knowledge = vector_search.vector_search(clean_sentence, classify_question['category'], collection)
                     
                     results = search_result.get_search_result(get_knowledge)
 
                     logger.info(f"smoth result: {results}")
-                    retrivel = model_retrivel(reflection_sentence, results)
+                    retrivel = model_retrivel.implement(reflection_sentence, results)
                     logger.info(f"question from model Retrivel: {retrivel}")
                     
-                    return retrivel
+                    return retrivel['assistant']
             except Exception as e:
                 print(e)
                 return False

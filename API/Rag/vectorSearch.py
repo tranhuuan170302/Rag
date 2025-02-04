@@ -22,11 +22,11 @@ class VectorSearchImpl(VectorSearch):
         if query_embedding is None:
             return "Invalid query embedding"
         
-        match_stage = {
-            "$match": {
-                "nameCategory": category
-            }
-        }
+        # match_stage = {
+        #     "$match": {
+        #         "nameCategory": category
+        #     }
+        # }
         # Stage 1: Vector search (phải là stage đầu tiên)
         vector_search_stage = {
             "$vectorSearch": {
@@ -57,7 +57,7 @@ class VectorSearchImpl(VectorSearch):
         }
 
         # Tạo pipeline
-        pipeline = [vector_search_stage, match_stage, project_stage]
+        pipeline = [vector_search_stage, project_stage]
 
         # Thực thi truy vấn
         try:
